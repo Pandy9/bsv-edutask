@@ -1,4 +1,4 @@
-# Edutask: a Training System for PA1417 ligma
+# Edutask: a Training System for PA1417 Group 11
 
 [![GitHub](https://img.shields.io/github/license/JulianFrattini/edutask)](./LICENSE)
 
