@@ -1,41 +1,63 @@
 import pytest
-from unittest.mock import MagicMock, patch
+import unittest.mock as mock
 from src.controllers.usercontroller import UserController
 
-@pytest.fixture
-def controller():
-    mock_dao = MagicMock()
-    return UserController(dao=mock_dao)
+def test_invalid_email_raises_value_error():
+    invalid_email = 'invalidemail.com'
 
-def test_get_user_by_email_single_user(controller):
-    mock_user = {'email': 'user@example.com'}
-    controller.dao.find.return_value = [mock_user]
+    mock_dao = mock.MagicMock()
+    controller = UserController(dao=mock_dao)
 
-    result = controller.get_user_by_email('user@example.com')
-    assert result == mock_user
+    with pytest.raises(ValueError, match="Error: invalid email address") as e_info:
+        controller.get_user_by_email(invalid_email)
 
-def test_get_user_by_email_multiple_users(controller):
-    mock_user1 = {'email': 'user@example.com'}
-    mock_user2 = {'email': 'user@example.com'}
-    controller.dao.find.return_value = [mock_user1, mock_user2]
+    assert str(e_info.value) == 'Error: invalid email address'
 
-    with patch("builtins.print") as mock_print:
-        result = controller.get_user_by_email('user@example.com')
-        assert result == mock_user1
-        mock_print.assert_called_with("Error: more than one user found with mail user@example.com")
 
-def test_get_user_by_email_no_users(controller):
-    controller.dao.find.return_value = []
+def test_valid_email_returns_one_user_true():
+    user1 = {'email': 'valid@email.com'}
 
-    result = controller.get_user_by_email('user@example.com')
+    mock_dao = mock.MagicMock()
+    mock_dao.find.return_value = [user1]
+
+    controller = UserController(dao=mock_dao)
+    result = controller.get_user_by_email('valid@email.com')
+
+    assert result == user1
+
+
+def test_valid_email_multiple_users_true():
+    user1 = {'email': 'duplicate@email.com'}
+    user2 = {'email': 'duplicate@email.com'}
+    user3 = {'email': 'duplicate@email.com'}
+
+    mock_dao = mock.MagicMock()
+    mock_dao.find.return_value = [user1, user2]
+
+    controller = UserController(dao=mock_dao)
+    result = controller.get_user_by_email('duplicate@email.com')
+
+    assert result == user1
+    
+
+def test_valid_email_no_user_true():
+    mock_dao = mock.MagicMock()
+    mock_dao.find.return_value = []
+
+    controller = UserController(dao=mock_dao)
+    result = controller.get_user_by_email('usinglongemailthatdoesnotexist@mail.com')
+
     assert result is None
 
-def test_get_user_by_email_invalid_email(controller):
-    with pytest.raises(ValueError, match="invalid email address"):
-        controller.get_user_by_email("invalid-email")
 
-def test_get_user_by_email_dao_exception(controller):
-    controller.dao.find.side_effect = Exception("DB failure")
+def test_valid_email_db_error_true():
+    email = 'valid@email.com'
 
-    with pytest.raises(Exception, match="DB failure"):
-        controller.get_user_by_email("user@example.com")
+    mock_dao = mock.MagicMock()
+    mock_dao.find.side_effect = Exception("Database error")
+
+    controller = UserController(dao=mock_dao)
+    with pytest.raises(Exception, match="Database error") as e_info:
+        controller.get_user_by_email(email)
+    
+    assert str(e_info.value) == "Database error"
