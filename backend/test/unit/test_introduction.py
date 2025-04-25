@@ -32,7 +32,7 @@ def test_valid_email_multiple_users_true():
     user3 = {'email': 'duplicate@email.com'}
 
     mock_dao = mock.MagicMock()
-    mock_dao.find.return_value = [user1, user2]
+    mock_dao.find.return_value = [user1, user2, user3]
 
     controller = UserController(dao=mock_dao)
     result = controller.get_user_by_email('duplicate@email.com')
