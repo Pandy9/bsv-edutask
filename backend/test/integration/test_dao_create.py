@@ -5,17 +5,16 @@ from src.util.dao import DAO
 
 @pytest.fixture
 def test_dao():
-    """Fixture to create a test DAO with a test collection."""
+    """Fixture to create a DAO connected to the real 'users' collection."""
     client = MongoClient('mongodb://localhost:27017/')
     test_db = client['test_database']
-    test_collection = test_db['test_collection']
+    users_collection = test_db['users']
 
-    dao = DAO()
-    dao.collection = test_collection
+    dao = DAO('users')
+    dao.collection = users_collectio
 
     yield dao
 
-    test_db.drop_collection('test_collection')
     client.close()
 
 def test_create_success(test_dao):
