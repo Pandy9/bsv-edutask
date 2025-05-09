@@ -60,4 +60,3 @@ def test_valid_email_db_error_true():
     with pytest.raises(Exception, match="Database error") as e_info:
         controller.get_user_by_email(email)
     
-    assert str(e_info.value) == "Database error"
