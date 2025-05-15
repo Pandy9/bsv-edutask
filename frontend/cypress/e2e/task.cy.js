@@ -70,28 +70,77 @@ describe('Testing the task management system', () => {
             .should('be.disabled')
         })
     })
+
+    it('Verify that an active todo item is marked as done after the icon is clicked', () => {
+      cy.contains('div.popup', taskTitle)
+        .should('contain.text', taskTitle)
+
+        .within(() => { // Find the todo-item and click its checkbox
+          cy.get('ul.todo-list')
+            .find('li.todo-item')
+            .first()
+            .find('span.checker.unchecked')
+            .click()
+
+          cy.get('ul.todo-list') // Verify that it is checked
+            .find('li.todo-item')
+            .first()
+            .find('span.checker.checked')
+            .should('exist')
+          
+          cy.get('ul.todo-list') // Verify line-through text
+            .find('li.todo-item')
+            .first()
+            .find('span.editable')
+            .should('have.css', 'text-decoration-line', 'line-through')
+        })
+    })
+
+    it('Verify that a checked todo item can be reset to active(unchecked) when the user clicks the icon again', () => {
+      cy.contains('div.popup', taskTitle)
+        .should('contain.text', taskTitle)
+
+        .within(() => { // Find the todo-item and click its checkbox
+          cy.get('ul.todo-list') // Find the todo-item and "uncheck" it
+            .find('li.todo-item')
+            .first()
+            .find('span.checker.checked')
+            .click()
+
+          cy.get('ul.todo-list') // Verify that it is unchecked
+            .find('li.todo-item')
+            .first()
+            .find('span.checker.unchecked')
+            .should('exist')
+          
+          cy.get('ul.todo-list') // Verify the line-through is removed
+            .find('li.todo-item')
+            .first()
+            .find('span.editable')
+            .should('not.have.css', 'text-decoration-line', 'line-through')
+          })
+    })
+
     it('Should delete a todo item and assert it is removed', () => {
     // Ensure popup is open with the right task title
-    cy.contains('div.popup', taskTitle)
+      cy.contains('div.popup', taskTitle)
         .should('contain.text', taskTitle)
         .within(() => {
-        // Find the last todo-item and click its delete button (span.remover)
-        cy.get('ul.todo-list')
+          // Find the last todo-item and click its delete button (span.remover)
+          cy.get('ul.todo-list')
             .find('li.todo-item')
             .last()
             .find('span.remover')
             .click()
         })
 
-    // Assert that the todo-item with the specific title no longer exists
-    cy.contains('div.popup', taskTitle)
+      // Assert that the todo-item with the specific title no longer exists
+      cy.contains('div.popup', taskTitle)
         .find('ul.todo-list')
         .find('li.todo-item')
         .contains(todoTitle)
         .should('not.exist')
     })
-
-
     
   after(function () {
     // clean up by deleting the user from the database
@@ -99,8 +148,9 @@ describe('Testing the task management system', () => {
       method: 'DELETE',
       url: `http://localhost:5000/users/${uid}`
     }).then((response) => {
-      cy.log(response.body)
+        cy.log(response.body)
+      })
     })
   })
-})
 
+  
