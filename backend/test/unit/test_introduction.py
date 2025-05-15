@@ -59,4 +59,3 @@ def test_valid_email_db_error_true():
     controller = UserController(dao=mock_dao)
     with pytest.raises(Exception, match="Database error") as e_info:
         controller.get_user_by_email(email)
-    
