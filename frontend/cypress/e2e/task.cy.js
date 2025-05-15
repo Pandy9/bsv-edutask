@@ -40,14 +40,26 @@ describe('Testing the task management system', () => {
         cy.get('form')
             .submit()
         
-    cy.contains('div', taskTitle).click()
-  })
-  it('starting out on the landing screen', () => {
-    // make sure the landing page contains a header with "login"
-    cy.get('h1')
-      .should('contain.text', 'Login')
-  })
+    cy.get('div.container-element a')
+    .last()
+    .click()
+})
+    it('Create a new todo item WITH a description and then delete it', () => {
+    // Add the todo item
+    cy.contains('div.popup', taskTitle)
+        .should('contain.text', taskTitle)
+        .find('form')
+        .find('input[type=text]')
+        .type(todoTitle)
 
+    cy.contains('div.popup', taskTitle)
+        .find('form.inline-form')
+        .submit()
+
+    // Assert todo item exists
+    cy.contains('li.todo-item', todoTitle).should('exist')
+    })
+    
   after(function () {
     // clean up by deleting the user from the database
     cy.request({
