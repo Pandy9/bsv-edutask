@@ -59,6 +59,39 @@ describe('Testing the task management system', () => {
     // Assert todo item exists
     cy.contains('li.todo-item', todoTitle).should('exist')
     })
+
+    it('Should not allow creating a todo item WITHOUT a description', () => {
+    cy.contains('div.popup', taskTitle)
+        .should('contain.text', taskTitle)
+        .find('form.inline-form')
+        .within(() => {
+  
+        cy.get('input[type=submit]')
+            .should('be.disabled')
+        })
+    })
+    it('Should delete a todo item and assert it is removed', () => {
+    // Ensure popup is open with the right task title
+    cy.contains('div.popup', taskTitle)
+        .should('contain.text', taskTitle)
+        .within(() => {
+        // Find the last todo-item and click its delete button (span.remover)
+        cy.get('ul.todo-list')
+            .find('li.todo-item')
+            .last()
+            .find('span.remover')
+            .click()
+        })
+
+    // Assert that the todo-item with the specific title no longer exists
+    cy.contains('div.popup', taskTitle)
+        .find('ul.todo-list')
+        .find('li.todo-item')
+        .contains(todoTitle)
+        .should('not.exist')
+    })
+
+
     
   after(function () {
     // clean up by deleting the user from the database
