@@ -48,5 +48,27 @@ describe('Testing the task management system', () => {
     // assert that the user is now logged in
     cy.get('h1')
       .should('contain.text', 'Your tasks, ' + name)
+
+    cy.contains('div', 'Title')
+      .find('input[type=text]')
+      .type('Test task')
+    
+    cy.contains('div', 'YouTube URL')
+        .find('input[type=text]')
+        .type('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    
+    cy.get('form')
+      .submit()
+  })
+
+  after(function () {
+    // clean up by deleting the user from the database
+    cy.request({
+      method: 'DELETE',
+      url: `http://localhost:5000/users/${uid}`
+    }).then((response) => {
+      cy.log(response.body)
+    })
   })
 })
+
